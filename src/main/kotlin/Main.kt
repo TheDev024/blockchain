@@ -1,9 +1,19 @@
 import java.security.MessageDigest
+import java.util.Random
+
+val random = Random()
+var proofNumber = 2
 
 fun main() {
+    proofNumber = getInput("Enter how many zeros the hash must start with: ").toInt()
     val blockchain = Blockchain()
     blockchain.generateChain()
     blockchain.printChain()
+}
+
+fun getInput(message: String): String {
+    print(message)
+    return readln()
 }
 
 fun applySha256(input: String): String {
