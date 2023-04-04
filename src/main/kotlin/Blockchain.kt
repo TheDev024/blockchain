@@ -1,12 +1,36 @@
+package blockchain
+
+import kotlin.concurrent.thread
+
 class Blockchain {
-    private val chain: MutableList<Block> = mutableListOf()
+    @Volatile
+    private var chain: Array<Block> = arrayOf()
 
-    fun generateChain() {
-        val firstBlock = Block()
-        chain.add(firstBlock)
+    private val miners = List(10) { Miner(it + 1) }
 
-        repeat(4) { chain.add(chain.last().nextBlock()) }
+    private fun generateBlock() {
+        miners.forEach { miner ->
+            thread(isDaemon = true) {
+                val previousBlock = chain.lastOrNull()
+                synchronized(this) {
+                    val generatedBlock = miner.mine(previousBlock)
+                    if ((chain.isEmpty() && generatedBlock.previousHash == "0") || chain.last().hash == generatedBlock.previousHash) {
+                        chain += generatedBlock
+                    }
+                }
+            }
+        }
+
+        val currentSize = chain.size
+
+        while (true) if (chain.size != currentSize) break
     }
 
-    fun printChain() = println(chain.joinToString("\n\n"))
+    fun generateChain(blockCount: Int) {
+        repeat(blockCount) {
+            generateBlock()
+        }
+    }
+
+    fun printChain() = println(chain.joinToString("\n\n", "\n"))
 }

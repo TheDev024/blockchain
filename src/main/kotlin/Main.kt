@@ -1,25 +1,19 @@
+package blockchain
+
 import java.security.MessageDigest
-import java.util.Random
+import java.util.*
 
 val random = Random()
-var proofNumber = 2
 
 fun main() {
-    proofNumber = getInput("Enter how many zeros the hash must start with: ").toInt()
     val blockchain = Blockchain()
-    blockchain.generateChain()
+    blockchain.generateChain(5)
     blockchain.printChain()
-}
-
-fun getInput(message: String): String {
-    print(message)
-    return readln()
 }
 
 fun applySha256(input: String): String {
     return try {
         val digest = MessageDigest.getInstance("SHA-256")
-        /* Applies sha256 to our input */
         val hash = digest.digest(input.toByteArray(charset("UTF-8")))
         val hexString = StringBuilder()
         for (elem in hash) {
