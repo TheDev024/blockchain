@@ -1,10 +1,11 @@
 package blockchain
 
 class Block(
+    private val id: Int = 1,
     private val minerNo: Int = 1,
     private val proofNumber: Int = 0,
-    private val id: Int = 1,
     val previousHash: String = "0",
+    private val messages: List<Message> = emptyList(),
     private val timeStamp: Long = System.currentTimeMillis()
 ) {
     private val magicNumber: Int
@@ -33,11 +34,12 @@ class Block(
         }
     }
 
-    fun nextBlock(minerNo: Int): Block = Block(
+    fun nextBlock(minerNo: Int, messages: List<Message>): Block = Block(
+        this.id + 1,
         minerNo,
         proofNumber + proofNoChange,
-        this.id + 1,
-        this.hash
+        this.hash,
+        messages
     )
 
     override fun toString(): String = "Block:\n" +
@@ -47,8 +49,12 @@ class Block(
             "Magic number: $magicNumber\n" +
             "Hash of the previous block:\n$previousHash\n" +
             "Hash of the block:\n$hash\n" +
+            "Block data: ${
+                if (messages.isEmpty()) "no messages"
+                else messages.joinToString("\n", "\n")
+            }\n" +
             "Block was generating for $generatingSeconds seconds\n" +
-            "N ($proofNumber) ${
+            "N ${
                 when (proofNoChange) {
                     -1 -> "was decreased by 1"
 
